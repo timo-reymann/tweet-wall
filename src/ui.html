@@ -1,0 +1,76 @@
+<!DOCTYPE>
+<html>
+<head>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+        }
+
+        body[data-dark=true] {
+            background: rgb(21, 32, 43);
+        }
+
+        .timeline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+        }
+
+        .timeline > * {
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="timeline"></div>
+
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let last = null;
+
+        const params = new URLSearchParams(window.location.search);
+        const isDark = params.get("dark") === "true";
+        const title = params.get("title") || 'TweetWall';
+        const timeline = document.querySelector(".timeline");
+
+        const loadTweets = () => {
+            console.log("Load since " + last);
+            fetch(`./tweets?sinceId=${last || ''}&search=${encodeURIComponent(params.get('q')) || '#ILoveTwitter'}&count=${params.get('count') || 5}`)
+                .then(r => r.json())
+                .then(tweets => {
+                    last = tweets[tweets.length - 1].id_str;
+
+                    Promise
+                        .all(tweets.map(t => twttr.widgets.createTweet(t.id_str, timeline, {
+                            conversation: 'none',
+                            lang: 'de',
+                            align: 'center',
+                            theme: isDark ? 'dark' : 'light',
+                            width: params.get("width") || 400
+                        })))
+                        .then(() => {
+                            window.scrollTo({
+                                left: 0,
+                                top: document.body.scrollHeight,
+                                behavior: 'smooth'
+                            });
+
+                            while (timeline.children.length > 10) {
+                                timeline.firstChild.remove()
+                            }
+                        })
+                })
+        };
+
+        document.title = title;
+        document.body.dataset.dark = isDark;
+        setInterval(loadTweets, 10000);
+        loadTweets();
+    })
+</script>
+</body>
+</html>
