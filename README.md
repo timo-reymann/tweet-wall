@@ -1,5 +1,7 @@
 tweet-wall
 ===
+[![GitHub Release](https://img.shields.io/github/v/tag/timo-reymann/tweet-wall.svg?label=version)](https://github.com/timo-reymann/tweet-wall/releases)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/timoreymann/tweet-wall)](https://hub.docker.com/r/timoreymann/tweet-wall/builds)
 
 ## What is this?
 A simple node app, packaged into a docker container to display recent tweets for a specific search, for events etc.
@@ -29,11 +31,10 @@ npm run server
 ## Using docker
 
 ```bash
-docker build . -t tweetwall
 docker run -p 3000:3000 \
            -e CONSUMER_KEY= \
            -e CONSUMER_SECRET= \
            -e ACCESS_TOKEN_KEY= \
            -e ACCESS_TOKEN_SECRET= \ 
-           tweetwall
+           timoreymann/tweet-wall
 ```
