@@ -33,13 +33,14 @@
         let last = null;
 
         const params = new URLSearchParams(window.location.search);
+        const tweetBatchSize = params.get('count') || 5;
         const isDark = params.get("dark") === "true";
         const title = params.get("title") || 'TweetWall';
         const timeline = document.querySelector(".timeline");
 
         const loadTweets = () => {
             console.log("Load since " + last);
-            fetch(`./tweets?sinceId=${last || ''}&search=${encodeURIComponent(params.get('q')) || '#ILoveTwitter'}&count=${params.get('count') || 5}`)
+            fetch(`./tweets?sinceId=${last || ''}&search=${encodeURIComponent(params.get('q')) || '#ILoveTwitter'}&count=${tweetBatchSize}`)
                 .then(r => r.json())
                 .then(tweets => {
                     last = tweets[tweets.length - 1].id_str;
@@ -59,7 +60,8 @@
                                 behavior: 'smooth'
                             });
 
-                            while (timeline.children.length > 10) {
+                            // Always display only 5 times the amount of new tweets
+                            while (timeline.children.length > (tweetBatchSize * 5)) {
                                 timeline.firstChild.remove()
                             }
                         })
